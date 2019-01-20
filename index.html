@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>标数据工具</title>
+<style type="text/css">
+html{height:100%}
+body{height:100%;margin:0px;padding:0px}
+#container{height:100%}
+</style>
+<script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak=qsZy4fym23jPRu8maXGKsPGbjUcgznKH">
+//v2.0版本的引用方式：src="http://api.map.baidu.com/api?v=2.0&ak=您的密钥"
+</script>
+</head>
+
+<body>
+<div id="container"></div>
+<script type="text/javascript">
+    function getCookie(cookie_name) {
+        var name = cookie_name + "=";
+        var ca = document.cookie.split(';');
+        for (var i = 0; i < ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) == ' ') c = c.substring(1);
+            if (c.indexOf(name) != -1) return c.substring(name.length, c.length);
+        }
+        return "";
+    }
+
+    var Ajax={
+        get: function(url, fn) {
+            // XMLHttpRequest对象用于在后台与服务器交换数据
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', url, true);
+            xhr.onreadystatechange = function() {
+                // readyState == 4说明请求已完成
+                if (xhr.readyState == 4 && xhr.status == 200 || xhr.status == 304) {
+                    // 从服务器获得数据
+                    fn.call(this, xhr.responseText);
+                }
+            };
+            xhr.send();
+        },
+        // datat应为'a=a1&b=b1'这种字符串格式，在jq里如果data为对象会自动将对象转成这种字符串格式
+        post: function (url, data, fn) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", url, true);
+            // 添加http头，发送信息至服务器时内容编码类型
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.setRequestHeader("X-CSRFToken", getCookie("csrftoken"));
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 304)) {
+                    fn.call(this, xhr.responseText);
+                }
+            };
+            xhr.send(JSON.stringify(data));
+        }
+    };
+    current_uid = '';
+    cur_status = 'default';
+
+
+
+
+    var map = new BMap.Map("container");
+
+    var point = new BMap.Point(120.308242, 31.588242);
+    map.centerAndZoom(point, 10);
+    map.enableScrollWheelZoom(true);
+    map.addControl(new BMap.NavigationControl());
+    map.addControl(new BMap.ScaleControl());
+    map.addControl(new BMap.OverviewMapControl());
+    map.addControl(new BMap.MapTypeControl());
+
+    function ShowData(){
+        // 设置默认停靠位置和偏移量
+        this.defaultAnchor = BMAP_ANCHOR_TOP_LEFT;
+        this.defaultOffset = new BMap.Size(10, 300);
+    }
+    // 通过JavaScript的prototype属性继承于BMap.Control
+    ShowData.prototype = new BMap.Control();
+
+    ShowData.prototype.initialize = function(map){
+        // 创建一个DOM元素
+        var div = document.createElement("div");
+        // 添加文字说明
+        div.appendChild(document.createTextNode("显示数据"));
+        // 设置样式
+        div.style.cursor = "pointer";
+        div.style.border = "1px solid gray";
+        div.style.backgroundColor = "white";
+        // 绑定事件，点击一次放大两级
+        div.onclick = function(e){
+            function show_data(data) {
+                data = data.split('\t');
+                current_uid = data[0];
+                data = data[1];
+                var l = data.split(',');
+                var i = 0;
+                var last_point = null;
+                while (i < l.length) {
+                    var x = l[i].split('|');
+                    console.log(x);
+                    console.log(x.length);
+                    if (x.length == 1) {break;}
+                    var point = new BMap.Point(parseFloat(x[1]), parseFloat(x[2]));
+                    var marker = new BMap.Marker(point);        // 创建标注
+                    map.addOverlay(marker);
+                    var timestr = '';
+                    if (x[0].startsWith('20180111')) {
+                        timestr = x[0].substr(8, 2) + ':' + x[0].substr(10, 2);
+                    }
+                    var labelgg = new BMap.Label(timestr,{offset:new BMap.Size(20,-10)});
+                    marker.setLabel(labelgg);
+                    if (last_point) {
+                        var polyline = new BMap.Polyline([
+                                point,
+                                last_point
+                            ],
+                            {strokeColor:"blue", strokeWeight:6, strokeOpacity:0.5}
+                        );
+                        map.addOverlay(polyline);
+                    }
+                    last_point = point;
+                    i ++;
+                }
+                map.centerAndZoom(point, 8);
+                cur_status = 'data_loaded'
+            }
+            Ajax.get("{% url 'showdata_temp:get_data' %}", show_data);
+        };
+        // 添加DOM元素到地图中
+        map.getContainer().appendChild(div);
+        // 将DOM元素返回
+        return div;
+    };
+    var my_show_data = new ShowData();
+    // 添加到地图当中
+    map.addControl(my_show_data);
+
+
+
+    function show_trace(ts, map) {
+        l = ts.split(',');
+        i = 0;
+        last_point = null;
+        while (i < l.length) {
+            x = l[i].split('|');
+            var point = new BMap.Point(parseFloat(x[2]), parseFloat(x[3]));
+            var marker = new BMap.Marker(point);        // 创建标注
+            map.addOverlay(marker);
+            if (last_point) {
+                var polyline = new BMap.Polyline([
+                        point,
+                        last_point
+                    ],
+                    {strokeColor:"blue", strokeWeight:6, strokeOpacity:0.5}
+                );
+                map.addOverlay(polyline);
+            }
+            last_point = point;
+            i ++;
+        }
+        map.centerAndZoom(point, 15);
+    }
+
+    function show_ares(ts, map, color) {
+        l = ts.split(',');
+        i = 0;
+        last_point = null;
+        while (i < l.length) {
+            x = l[i].split(' ');
+            var point = new BMap.Point(parseFloat(x[0]), parseFloat(x[1]));
+            var marker = new BMap.Marker(point);        // 创建标注
+            map.addOverlay(marker);
+            if (last_point) {
+                var polyline = new BMap.Polyline([
+                        point,
+                        last_point
+                    ],
+                    {strokeColor:color, strokeWeight:6, strokeOpacity:0.5}
+                );
+                map.addOverlay(polyline);
+            }
+            last_point = point;
+            i ++;
+        }
+        //map.centerAndZoom(point, 15);
+    }
+
+
+
+    function MakeDataNote(){
+        // 设置默认停靠位置和偏移量
+        this.defaultAnchor = BMAP_ANCHOR_TOP_LEFT;
+        this.defaultOffset = new BMap.Size(10, 350);
+    }
+    // 通过JavaScript的prototype属性继承于BMap.Control
+    MakeDataNote.prototype = new BMap.Control();
+
+    MakeDataNote.prototype.initialize = function(map){
+        var div = document.createElement("div");
+        div.appendChild(document.createTextNode("提交数据标记"));
+        div.style.cursor = "pointer";
+        div.style.border = "1px solid gray";
+        div.style.backgroundColor = "white";
+        div.onclick = function(e){
+            var worth = confirm("该数据是否有效？（如果数据点太少是无效数据）");
+            var result_show = '';
+            var result_flag = '';
+            var time_str = '';
+            if (worth) {
+                var hard = confirm("是否是疑难数据？（疑难数据指既无法确定坐了火车，也不能排除没坐）");
+                if (!hard) {
+                    var rail = confirm("用户是否乘火车出行？");
+                    if (rail) {
+                        time_str = prompt("请输入估计的起至时间(例如 08:06-17:30)");
+                        result_show += '火车出行； ' + time_str;
+                        result_flag = 'ra';
+                    }
+                    else {
+                        result_show += '未乘火车; ';
+                        result_flag = 'no';
+                    }
+                } else {
+                    result_show += '疑难数据； ';
+                    result_flag = 'ca';
+                }
+            }
+            else {
+                result_show += '数据无价值; ';
+                result_flag = 'wo';
+            }
+            var note = prompt("请输入备注(如果能确定火车出行，请写估计的上车下车站点，也可写估计乘汽车，或者该用户未出市区等，也可以不填)");
+            result_show += note;
+            var confir = confirm('请确认数据是否正确：' + result_show);
+            if (confir) {
+                alert('提交数据');
+                Ajax.post("{% url 'showdata_temp:data_note' %}",{user_id: current_uid , result_flag: result_flag,result: time_str, note: note}, function(data){alert(data)});
+            }
+            else {
+                alert('数据未提交，可再次点击提交');
+            }
+
+        };
+        // 添加DOM元素到地图中
+        map.getContainer().appendChild(div);
+        // 将DOM元素返回
+        return div;
+    }
+    var make_data_note = new MakeDataNote();
+    // 添加到地图当中
+    map.addControl(make_data_note);
+    // 南京站
+    show_ares('118.801128 32.083000,118.801128 32.091728,118.792400 32.091728,118.792400 32.083000,118.801128 32.083000', map, 'red');
+    // 南京南站
+    show_ares('118.803570 31.963514,118.803570 31.975985,118.791099 31.975985,118.791099 31.963514,118.803570 31.963514', map, 'red');
+    // 镇江站
+    show_ares('119.435841 32.194943,119.435841 32.200939,119.429844 32.200939,119.429844 32.194943,119.435841 32.194943', map, 'red');
+    // 镇江南站
+    show_ares('119.428695 32.148059,119.428695 32.155530,119.421224 32.155530,119.421224 32.148059,119.428695 32.148059', map, 'red');
+    // 常州站
+    show_ares('119.976341 31.781477,119.976341 31.788936,119.968882 31.788936,119.968882 31.781477,119.976341 31.781477', map, 'red');
+    // 常州北站
+    show_ares('119.959679 31.848855,119.959679 31.857755,119.950779 31.857755,119.950779 31.848855,119.959679 31.848855', map, 'red');
+    // 无锡站
+    show_ares('120.310223 31.583047,120.310223 31.591890,120.301380 31.591890,120.301380 31.583047,120.310223 31.583047', map, 'red');
+    // 无锡东站
+    show_ares('120.463478 31.593375,120.463478 31.601232,120.455621 31.601232,120.455621 31.593375,120.463478 31.593375', map, 'red');
+    // 苏州站
+    show_ares('120.614695 31.325784,120.614695 31.333419,120.607060 31.333419,120.607060 31.325784,120.614695 31.325784', map, 'red');
+    // 苏州北站
+    show_ares('120.648276 31.417052,120.648276 31.425957,120.639371 31.425957,120.639371 31.417052,120.648276 31.417052', map,  'red');
+    // 上海站
+    show_ares('121.459553 31.246393,121.459553 31.253249,121.452697 31.253249,121.452697 31.246393,121.459553 31.246393', map, 'red');
+    // 上海虹桥
+    show_ares('121.323736 31.190929,121.323736 31.198349,121.316316 31.198349,121.316316 31.190929,121.323736 31.190929', map, 'red');
+    //show_ares('', map, 'red');
+</script>
+</body>
+</html>

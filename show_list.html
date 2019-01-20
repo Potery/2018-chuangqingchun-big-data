@@ -1,0 +1,6 @@
+<table>
+<tr><td> User ID</td></tr>
+{% for uid in uids %}
+<tr><td><a target="_blank" href="{% url 'showdata_temp:show_user_page' %}?uid={{ uid }}">{{ uid }}</a></td></tr>
+{% endfor %}
+</table>
