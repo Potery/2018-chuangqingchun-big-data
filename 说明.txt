@@ -1,0 +1,5 @@
+d目录放原始数据
+xdata存放自动生成的迭代数据信息
+执行方法 
+sh run.sh datalist1   在验证集上运行
+sh run.sh datalist2   在测试集上运行
