@@ -98,30 +98,22 @@ Ranking score: submit validation-set answers, and rank according to the total sc
 Final Score: submit test-set answers and rank them according to the total score.
 
 1.F1score
-$$
-F_1=\frac{2\times P \times R}{P + R}
-$$
-P and R scored Precision and Recall respectively:
-$$
-Precision = \frac{TP}{TP+FP}
-$$
 
-$$
-Recall = \frac{TP}{TP+TN}
-$$
+![](http://wx4.sinaimg.cn/large/007cqMIHly1g2qqrf6quqj304p01x742.jpg)
+
+P and R scored Precision and Recall respectively:
+
+![](http://wx3.sinaimg.cn/large/007cqMIHly1g2qqrkqsanj306003b0sl.jpg)
 
 TP is the number of participants who submit answers, FP is the number of participants who actually travel by rail, FP is the number of participants who travel by rail and TN is the number of participants who actually travel by rail.
 
 2.Scoring formula：
-$$
-s=\frac{1}{N}\sum_{i=0}^N((|T_1-T_1^*|)^2) \times 0.4 + (|T_2-T_2^*)^2\times 0.4 + (T_d-T_d^*)^2 \times 0.2
-$$
 
-$$
-Score = 10^{-s} \times R
-$$
+![](http://wx2.sinaimg.cn/large/007cqMIHly1g2qqrn77erj30fu032dfs.jpg)
 
-Among them, N is the number of actual railway trips in the answers submitted by the participants. T1* and T2* are given departure arrival times, T1 and T2 are generated departure arrival times for competitors, Td is T2-T1, Td* is T1*-T2*. (Time units are hours)
+
+
+mong them, N is the number of actual railway trips in the answers submitted by the participants. T1* and T2* are given departure arrival times, T1 and T2 are generated departure arrival times for competitors, Td is T2-T1, Td* is T1*-T2*. (Time units are hours)
 
 The total score of the team is: the score of the first question + the score of the second question.
 
@@ -409,30 +401,21 @@ UID|20180111110946|117.2425|31.8325|83401
 最终得分：提交测试集答案，根据总分排名。
 
 1.F1score
-$$
-F_1=\frac{2\times P \times R}{P + R}
-$$
+
+![](http://wx4.sinaimg.cn/large/007cqMIHly1g2qqrf6quqj304p01x742.jpg)
+
 其中P和R分别为 Precision 和 Recall得分：
 
-$$
-Precision = \frac{TP}{TP+FP}
-$$
+![](http://wx3.sinaimg.cn/large/007cqMIHly1g2qqrkqsanj306003b0sl.jpg)
 
-$$
-Recall = \frac{TP}{TP+TN}
-$$
+
 
 其中TP为参赛者提交答案中，通过铁路出行中实际铁路出行的人数，FP为参赛者提交答案中通过铁路出行中非铁路出行的人数，TN为参赛者提交答案中非铁路出行中实际通过铁路出行的人数。
 
 2.评分公式：
 
-$$
-s=\frac{1}{N}\sum_{i=0}^N((|T_1-T_1^*|)^2) \times 0.4 + (|T_2-T_2^*)^2\times 0.4 + (T_d-T_d^*)^2 \times 0.2
-$$
+![](http://wx2.sinaimg.cn/large/007cqMIHly1g2qqrn77erj30fu032dfs.jpg)
 
-$$
-Score = 10^{-s} \times R
-$$
 
 其中N为参赛者提交答案中实际铁路出行的人数。T1*和T2*为给定的出发到达时间，T1和T2为参赛者生成的出发到达时间,Td为T2-T1,Td*为T1*-T2*。（时间计算单位为小时）
 
