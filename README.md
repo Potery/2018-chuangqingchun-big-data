@@ -2,6 +2,8 @@
 
 Our team participate in the 2018 ChuangQingChun Competition, the National Competition, which is sponsored by the Central Committee of the Communist Youth League,  and co-sponsored by China Telecom.  In the theme competition of Big Data , we propose an algorithm which judges whether the user travel by railway and predict its corresponding time. We get the fifth place in BIG DATA competition (Bronze medal).
 
+![奖杯和证书](http://wx1.sinaimg.cn/large/007cqMIHly1g3ssxo54ndj30u01hckjm.jpg)
+
 ### Introduction
 
 > On November 8, 2013, President Xi sent a special congratulatory letter to the Organizing Committee of China Station of 2013 Global Entrepreneurship Week , emphasizing the important role of young students in innovation and entrepreneurship, and pointing out that the whole society should attach importance to and support youth innovation and entrepreneurship. The Third Plenary Session of the Eighteenth Central Committee of the Communist Party of China (CPC) made special arrangements for "improving the mechanism of promoting employment and entrepreneurship" and pointed out the clear direction. In order to implement General Secretary Xi Jinping's series of important speeches and the relevant directives of the Party Central Committee, and meet the needs of the development of college students'entrepreneurship, the Central Committee of the Communist Youth League, the Ministry of Education, the Ministry of Human Resources and Social Security, the Chinese Association of Science and Technology and the National Federation of Scholars decided to jointly organize and launch the National University of "Creating Youth" from 2014 on the basis of the original "Challenge Cup" competition for Chinese College Students The competition is held every two years.
